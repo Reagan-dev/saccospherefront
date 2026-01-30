@@ -21,7 +21,7 @@ interface UseAuthReturn {
   token: string | null
 }
 
-const API_BASE_URL = 'https://saccosphere-atze.onrender.com/api'
+const API_BASE_URL = 'https://saccosphere-mtsm.onrender.com/api'
 const LOGIN_ENDPOINT = `${API_BASE_URL}/accounts/login/`
 const REGISTER_ENDPOINT = `${API_BASE_URL}/accounts/register/`
 const CHANGE_PASSWORD_ENDPOINT = `${API_BASE_URL}/accounts/change-password/`
@@ -60,7 +60,7 @@ export function useAuth(): UseAuthReturn {
     setError(null)
 
     try {
-      const response = await axios.post<LoginResponse>(
+      const response = await axios.post<any>(
         LOGIN_ENDPOINT,
         {
           email: credentials.email,
@@ -75,12 +75,17 @@ export function useAuth(): UseAuthReturn {
 
       // Extract token from response (handles different response formats)
       const accessToken =
-        response.data.access ||
-        response.data.token ||
-        response.data.tokens?.access
+        response.data?.data?.access ||
+        response.data?.access ||
+        response.data?.token ||
+        response.data?.tokens?.access
 
       const refreshToken =
-        response.data.refresh || response.data.tokens?.refresh
+        response.data?.data?.refresh ||
+        response.data?.refresh ||
+        response.data?.tokens?.refresh
+  
+
 
       if (!accessToken) {
         throw new Error('No access token received from server')
@@ -263,7 +268,7 @@ export function useAuth(): UseAuthReturn {
           throw new Error('You must be logged in to change your password')
         }
 
-        const response = await axios.post(
+        await axios.post(
           CHANGE_PASSWORD_ENDPOINT,
           {
             old_password: data.old_password,
